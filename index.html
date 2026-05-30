@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ramu Jamu – Ancient Wisdom. Modern Cup.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ─── CSS CUSTOM PROPERTIES ─────────────────────────────── */
+    :root {
+      --cream:      #F5F0E8;
+      --cream-dark: #EDE4D3;
+      --maroon:     #6B1A2A;
+      --maroon-deep:#4A0F1C;
+      --maroon-light:#8B2A3E;
+      --brown:      #8B5E3C;
+      --brown-light:#C49A6C;
+      --gold:       #C8A84B;
+      --gold-light: #E8C97A;
+      --green-muted:#5C7A5A;
+      --text-dark:  #2C1810;
+      --text-mid:   #5C3D2E;
+      --text-light: #8B6B56;
+
+      --font-heading: 'Playfair Display', Georgia, serif;
+      --font-body:    'Lato', sans-serif;
+
+      --section-pad: clamp(4rem, 8vw, 7rem) clamp(1.5rem, 6vw, 5rem);
+      --radius: 12px;
+      --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ─── RESET & BASE ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--cream);
+      color: var(--text-dark);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    img { max-width: 100%; display: block; }
+    a { color: inherit; text-decoration: none; }
+
+    h1, h2, h3, h4 { font-family: var(--font-heading); line-height: 1.2; }
+
+    /* Paper texture overlay on body */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    /* ─── BATIK SVG PATTERN ─────────────────────────────────── */
+    .batik-pattern {
+      position: absolute;
+      inset: -20%;
+      width: 140%;
+      height: 140%;
+      opacity: 0.07;
+      animation: batikDrift 30s linear infinite;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill:none;stroke:%23C8A84B;stroke-width:1%7D%3C/style%3E%3C/defs%3E%3Ccircle class='c' cx='60' cy='60' r='40'/%3E%3Ccircle class='c' cx='60' cy='60' r='28'/%3E%3Ccircle class='c' cx='60' cy='60' r='16'/%3E%3Ccircle class='c' cx='60' cy='60' r='6'/%3E%3Cpath class='c' d='M60 20v80M20 60h80M31 31l58 58M31 89l58-58'/%3E%3Ccircle class='c' cx='20' cy='20' r='14'/%3E%3Ccircle class='c' cx='100' cy='20' r='14'/%3E%3Ccircle class='c' cx='20' cy='100' r='14'/%3E%3Ccircle class='c' cx='100' cy='100' r='14'/%3E%3Cpath class='c' d='M60 20C70 32 70 48 60 60C50 72 50 88 60 100M20 60C32 50 48 50 60 60C72 70 88 70 100 60'/%3E%3C/svg%3E");
+      background-size: 120px 120px;
+    }
+
+    @keyframes batikDrift {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      25%  { transform: translate(2%, 1.5%) rotate(1.5deg); }
+      50%  { transform: translate(0, 3%) rotate(3deg); }
+      75%  { transform: translate(-2%, 1.5%) rotate(1.5deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    /* ─── WAVY DIVIDER ──────────────────────────────────────── */
+    .wave-divider { display: block; width: 100%; line-height: 0; overflow: hidden; }
+    .wave-divider svg { display: block; }
+
+    /* ─── STICKY NAV ────────────────────────────────────────── */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.4rem clamp(1.5rem, 5vw, 4rem);
+      transition: padding var(--transition), background var(--transition), box-shadow var(--transition);
+    }
+
+    #nav.scrolled {
+      background: rgba(245, 240, 232, 0.97);
+      backdrop-filter: blur(8px);
+      padding: 0.85rem clamp(1.5rem, 5vw, 4rem);
+      box-shadow: 0 2px 20px rgba(107, 26, 42, 0.1);
+    }
+
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: var(--maroon);
+      letter-spacing: 0.02em;
+      position: relative;
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links {
+      display: flex;
+      gap: clamp(1.2rem, 3vw, 2.4rem);
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-dark);
+      position: relative;
+      transition: color var(--transition);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0; right: 100%;
+      height: 1.5px;
+      background: var(--maroon);
+      transition: right var(--transition);
+    }
+    .nav-links a:hover { color: var(--maroon); }
+    .nav-links a:hover::after { right: 0; }
+
+    .nav-cta {
+      background: var(--maroon);
+      color: var(--cream) !important;
+      padding: 0.5rem 1.3rem;
+      border-radius: 50px;
+      font-size: 0.8rem !important;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition) !important;
+    }
+    .nav-cta:hover {
+      background: var(--maroon-deep) !important;
+      transform: scale(1.05) !important;
+      box-shadow: 0 4px 16px rgba(107, 26, 42, 0.35) !important;
+    }
+    .nav-cta::after { display: none !important; }
+
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--maroon);
+      border-radius: 2px;
+      transition: var(--transition);
+    }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: linear-gradient(145deg, #3A1018 0%, #5A1520 25%, #6B2030 50%, #8B4020 75%, #6B3818 100%);
+    }
+
+    .hero-bg-parallax {
+      position: absolute;
+      inset: -15%;
+      width: 130%; height: 130%;
+      background: radial-gradient(ellipse at 30% 40%, rgba(200, 168, 75, 0.18) 0%, transparent 60%),
+                  radial-gradient(ellipse at 75% 70%, rgba(92, 122, 90, 0.12) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 20%, rgba(139, 94, 60, 0.2) 0%, transparent 55%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      color: var(--cream);
+      max-width: 760px;
+      padding: 0 2rem;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 1.2rem;
+      opacity: 0;
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 8vw, 6rem);
+      font-weight: 700;
+      line-height: 1.08;
+      margin-bottom: 1.4rem;
+      opacity: 0;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-sub {
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      font-weight: 300;
+      color: rgba(245, 240, 232, 0.82);
+      max-width: 520px;
+      margin: 0 auto 2.4rem;
+      opacity: 0;
+    }
+
+    .hero-cta {
+      opacity: 0;
+    }
+
+    .btn-primary {
+      display: inline-block;
+      background: var(--maroon);
+      color: var(--cream);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 1rem 2.6rem;
+      border-radius: 50px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .btn-primary:hover {
+      background: var(--maroon-deep);
+      transform: scale(1.06) translateY(-2px);
+      box-shadow: 0 8px 30px rgba(107, 26, 42, 0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--cream);
+      color: var(--cream);
+    }
+    .btn-outline:hover {
+      background: var(--cream);
+      color: var(--maroon);
+      box-shadow: 0 8px 30px rgba(245, 240, 232, 0.25);
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 2.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(245, 240, 232, 0.55);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: scrollBounce 2.5s ease-in-out infinite;
+    }
+
+    .hero-scroll-hint svg { width: 18px; opacity: 0.6; }
+
+    @keyframes scrollBounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ─── INTRO STRIP ───────────────────────────────────────── */
+    #intro-strip {
+      background: var(--maroon);
+      padding: 3.5rem clamp(1.5rem, 6vw, 5rem);
+      position: relative;
+      z-index: 1;
+    }
+
+    .intro-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .intro-item {
+      text-align: center;
+      color: var(--cream);
+    }
+
+    .intro-icon {
+      width: 56px; height: 56px;
+      margin: 0 auto 1rem;
+      border: 1.5px solid var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .intro-icon svg { width: 28px; height: 28px; fill: var(--gold); }
+
+    .intro-item h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+      color: var(--gold-light);
+    }
+
+    .intro-item p {
+      font-size: 0.85rem;
+      color: rgba(245, 240, 232, 0.72);
+      line-height: 1.6;
+    }
+
+    /* ─── FLAVORS SECTION ───────────────────────────────────── */
+    #flavors {
+      padding: var(--section-pad);
+      background: var(--cream);
+      position: relative;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.9rem, 4vw, 3rem);
+      font-weight: 600;
+      color: var(--maroon);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-sub {
+      font-size: 1rem;
+      color: var(--text-light);
+      max-width: 560px;
+      margin-bottom: 3rem;
+    }
+
+    .flavors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.8rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .flavor-card {
+      background: #fff;
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(44, 24, 16, 0.07);
+      transition: transform var(--transition), box-shadow var(--transition);
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .flavor-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 16px 40px rgba(107, 26, 42, 0.15);
+    }
+
+    .flavor-swatch {
+      height: 130px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .flavor-swatch::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='25' fill='none' stroke='rgba(255,255,255,0.12)' stroke-width='1'/%3E%3Ccircle cx='40' cy='40' r='15' fill='none' stroke='rgba(255,255,255,0.1)' stroke-width='1'/%3E%3Cpath d='M40 15v50M15 40h50' stroke='rgba(255,255,255,0.08)' stroke-width='1'/%3E%3C/svg%3E") center/80px;
+    }
+
+    .swatch-turmeric  { background: linear-gradient(135deg, #C8852A, #E8A844); }
+    .swatch-pandan    { background: linear-gradient(135deg, #4A7A3A, #7AAF5A); }
+    .swatch-tamarind  { background: linear-gradient(135deg, #7A3A18, #B05820); }
+    .swatch-cinnamon  { background: linear-gradient(135deg, #6B1A2A, #9A3848); }
+
+    .swatch-icon {
+      position: absolute;
+      bottom: 16px; right: 18px;
+      width: 44px; height: 44px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .flavor-body { padding: 1.4rem 1.5rem 1.6rem; }
+
+    .flavor-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--brown-light);
+      margin-bottom: 0.4rem;
+    }
+
+    .flavor-name {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 0.6rem;
+    }
+
+    .flavor-desc {
+      font-size: 0.88rem;
+      color: var(--text-light);
+      line-height: 1.65;
+      margin-bottom: 1.2rem;
+    }
+
+    .btn-card {
+      display: inline-block;
+      background: var(--maroon);
+      color: var(--cream);
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.6rem 1.5rem;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+      border: none;
+    }
+
+    .btn-card:hover {
+      background: var(--maroon-deep);
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(107, 26, 42, 0.3);
+    }
+
+    /* ─── HOW TO BREW ───────────────────────────────────────── */
+    #brew {
+      padding: var(--section-pad);
+      background: var(--cream-dark);
+      position: relative;
+    }
+
+    .brew-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .brew-steps::before {
+      content: '';
+      position: absolute;
+      top: 50px; left: 15%; right: 15%;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .brew-step {
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    .brew-step-num {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: var(--maroon);
+      color: var(--cream);
+      font-family: var(--font-heading);
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.2rem;
+      position: relative;
+      box-shadow: 0 4px 16px rgba(107, 26, 42, 0.25);
+    }
+
+    .brew-step-icon {
+      width: 80px; height: 80px;
+      margin: 0 auto 1rem;
+      background: rgba(200, 168, 75, 0.12);
+      border: 2px dashed var(--gold);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+    }
+
+    .brew-step h3 {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      color: var(--maroon);
+      margin-bottom: 0.5rem;
+    }
+
+    .brew-step p {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    /* ─── HERITAGE STORY ────────────────────────────────────── */
+    #story {
+      padding: var(--section-pad);
+      background: var(--maroon);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .story-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(2rem, 5vw, 5rem);
+      align-items: center;
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .story-text .section-eyebrow { color: var(--gold-light); }
+
+    .story-text .section-title { color: var(--cream); font-size: clamp(1.7rem, 3.5vw, 2.6rem); }
+
+    .story-text p {
+      font-size: 0.97rem;
+      color: rgba(245, 240, 232, 0.78);
+      line-height: 1.8;
+      margin-bottom: 1.2rem;
+    }
+
+    .story-text .btn-primary { margin-top: 0.6rem; }
+
+    .story-decor {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .story-medallion {
+      width: clamp(240px, 35vw, 380px);
+      height: clamp(240px, 35vw, 380px);
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, rgba(200, 168, 75, 0.22), rgba(107, 26, 42, 0.6));
+      border: 2px solid rgba(200, 168, 75, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .story-medallion::before {
+      content: '';
+      position: absolute;
+      inset: 14px;
+      border-radius: 50%;
+      border: 1px dashed rgba(200, 168, 75, 0.4);
+    }
+
+    .story-medallion::after {
+      content: '';
+      position: absolute;
+      inset: 28px;
+      border-radius: 50%;
+      border: 1px solid rgba(200, 168, 75, 0.2);
+    }
+
+    .story-medallion-text {
+      text-align: center;
+      z-index: 1;
+    }
+
+    .story-medallion-text .big-num {
+      font-family: var(--font-heading);
+      font-size: clamp(3.5rem, 8vw, 6rem);
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+
+    .story-medallion-text p {
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(245, 240, 232, 0.65);
+      margin: 0;
+    }
+
+    .story-ring-1, .story-ring-2 {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(200, 168, 75, 0.15);
+      animation: ringPulse 4s ease-in-out infinite;
+    }
+    .story-ring-1 { inset: -30px; animation-delay: 0s; }
+    .story-ring-2 { inset: -60px; animation-delay: 1.5s; }
+
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 0.15; transform: scale(1.03); }
+    }
+
+    /* ─── TESTIMONIALS ──────────────────────────────────────── */
+    #testimonials {
+      padding: var(--section-pad);
+      background: var(--cream);
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.8rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .testimonial-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 2rem 1.8rem;
+      box-shadow: 0 2px 16px rgba(44, 24, 16, 0.06);
+      border-left: 3.5px solid var(--gold);
+      position: relative;
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+
+    .testimonial-card::before {
+      content: '\201C';
+      font-family: var(--font-heading);
+      font-size: 4rem;
+      color: var(--gold);
+      opacity: 0.35;
+      position: absolute;
+      top: 0.5rem; left: 1.2rem;
+      line-height: 1;
+    }
+
+    .testimonial-text {
+      font-size: 0.97rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 1.4rem;
+      padding-top: 1.5rem;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .author-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--maroon);
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .author-info strong {
+      display: block;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+
+    .author-info span {
+      font-size: 0.78rem;
+      color: var(--text-light);
+    }
+
+    .star-row {
+      display: flex;
+      gap: 2px;
+      margin-bottom: 0.6rem;
+    }
+
+    .star-row span { color: var(--gold); font-size: 0.9rem; }
+
+    /* ─── CTA BANNER ────────────────────────────────────────── */
+    #cta-banner {
+      padding: 5rem clamp(1.5rem, 6vw, 5rem);
+      background: linear-gradient(135deg, #3A1018 0%, #6B1A2A 60%, #8B4020 100%);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta-banner .batik-pattern { opacity: 0.05; }
+
+    .cta-inner { position: relative; z-index: 1; }
+
+    .cta-inner .section-eyebrow { color: var(--gold-light); margin-bottom: 1rem; }
+
+    .cta-inner h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      color: var(--cream);
+      margin-bottom: 1rem;
+    }
+
+    .cta-inner p {
+      font-size: 1rem;
+      color: rgba(245, 240, 232, 0.75);
+      max-width: 520px;
+      margin: 0 auto 2.2rem;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ─── FOOTER ────────────────────────────────────────────── */
+    #footer {
+      background: var(--text-dark);
+      color: var(--cream);
+      padding: 3.5rem clamp(1.5rem, 6vw, 5rem) 2rem;
+    }
+
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 2.5rem;
+      padding-bottom: 2.5rem;
+      border-bottom: 1px solid rgba(245, 240, 232, 0.12);
+      margin-bottom: 2rem;
+    }
+
+    .footer-brand .nav-logo {
+      font-size: 1.4rem;
+      color: var(--cream);
+      display: block;
+      margin-bottom: 0.75rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.85rem;
+      color: rgba(245, 240, 232, 0.55);
+      line-height: 1.7;
+      max-width: 240px;
+    }
+
+    .footer-col h4 {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .footer-col ul { list-style: none; }
+
+    .footer-col ul li { margin-bottom: 0.55rem; }
+
+    .footer-col ul li a {
+      font-size: 0.88rem;
+      color: rgba(245, 240, 232, 0.6);
+      transition: color var(--transition);
+    }
+
+    .footer-col ul li a:hover { color: var(--cream); }
+
+    .footer-bottom {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-tagline {
+      font-family: var(--font-heading);
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--gold);
+    }
+
+    .footer-copy {
+      font-size: 0.78rem;
+      color: rgba(245, 240, 232, 0.35);
+    }
+
+    /* ─── SECTION HEADER CENTERING UTIL ────────────────────── */
+    .section-header { text-align: center; margin-bottom: 3rem; }
+    .section-header .section-sub { margin: 0 auto; }
+
+    /* ─── SCROLL ANIMATION HELPERS ──────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(35px);
+    }
+
+    /* ─── MOBILE RESPONSIVE ─────────────────────────────────── */
+    @media (max-width: 900px) {
+      .story-inner { grid-template-columns: 1fr; }
+      .story-decor { order: -1; }
+      .story-medallion { width: 220px; height: 220px; }
+      .footer-inner { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 700px) {
+      .brew-steps { grid-template-columns: 1fr; }
+      .brew-steps::before { display: none; }
+      .intro-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .nav-links { display: none; }
+      .nav-hamburger { display: flex; }
+    }
+
+    @media (max-width: 560px) {
+      .footer-inner { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    /* ─── MOBILE NAV OVERLAY ────────────────────────────────── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(245, 240, 232, 0.98);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .mobile-nav.open { display: flex; }
+
+    .mobile-nav a {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      color: var(--maroon);
+    }
+
+    .mobile-nav-close {
+      position: absolute;
+      top: 1.5rem; right: 1.5rem;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      color: var(--maroon);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── MOBILE NAV OVERLAY ─────────────────────── -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="mobile-nav-close" id="mobileClose" aria-label="Close menu">✕</button>
+  <a href="#story" onclick="closeMobileNav()">Our Story</a>
+  <a href="#flavors" onclick="closeMobileNav()">Flavors</a>
+  <a href="#brew" onclick="closeMobileNav()">How to Brew</a>
+  <a href="#cta-banner" onclick="closeMobileNav()">Shop</a>
+</div>
+
+<!-- ─── NAV ───────────────────────────────────────── -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Ramu <span>Jamu</span></a>
+  <ul class="nav-links">
+    <li><a href="#story">Our Story</a></li>
+    <li><a href="#flavors">Flavors</a></li>
+    <li><a href="#brew">How to Brew</a></li>
+    <li><a href="#cta-banner" class="nav-cta">Shop</a></li>
+  </ul>
+  <div class="nav-hamburger" id="hamburger" aria-label="Open menu" role="button" tabindex="0">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ─── HERO ──────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-bg-parallax" id="heroBg"></div>
+  <div class="batik-pattern"></div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow" id="heroEyebrow">✦ Traditional Herbal Powder ✦</p>
+    <h1 class="hero-title" id="heroTitle">
+      Ancient Wisdom.<br><em>Modern Cup.</em>
+    </h1>
+    <p class="hero-sub" id="heroSub">
+      Handcrafted Jamu blends rooted in Indonesian-Singaporean heritage. 
+      Just add hot water — and let centuries of tradition nourish you.
+    </p>
+    <div class="hero-cta" id="heroCta">
+      <a href="#flavors" class="btn-primary">Discover Your Blend</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll-hint">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+    Scroll
+  </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ──────────────────────────────── -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,30 C240,60 480,0 720,30 C960,60 1200,0 1440,30 L1440,0 L0,0 Z" fill="#6B1A2A"/>
+  </svg>
+</div>
+
+<!-- ─── INTRO STRIP ────────────────────────────────── -->
+<section id="intro-strip">
+  <div class="intro-grid">
+    <div class="intro-item fade-up">
+      <div class="intro-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+      </div>
+      <h3>100% Natural</h3>
+      <p>No artificial flavours, preservatives, or additives. Just plants.</p>
+    </div>
+    <div class="intro-item fade-up">
+      <div class="intro-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 3L1 9l4 2.18V17h2v-4.82L9 13.36V17c0 2.21 1.34 4 3 4s3-1.79 3-4v-3.64l5-2.73V17h2v-5.82L23 9 12 3zm0 2.24L18.57 9 12 12.48 5.43 9 12 5.24z"/>
+        </svg>
+      </div>
+      <h3>Traditional Recipe</h3>
+      <p>Generations of Jamu knowledge, preserved in every sachet.</p>
+    </div>
+    <div class="intro-item fade-up">
+      <div class="intro-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 16L12 15.45 7.77 18l1.12-4.81-3.73-3.23 4.92-.42L12 5l1.92 4.53 4.92.42-3.73 3.23L16.23 18z"/>
+        </svg>
+      </div>
+      <h3>Brew in 60 Seconds</h3>
+      <p>Dissolve, stir, and savour — wellness that fits your pace.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ──────────────────────────────── -->
+<div class="wave-divider">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,30 C240,0 480,60 720,30 C960,0 1200,60 1440,30 L1440,60 L0,60 Z" fill="#6B1A2A"/>
+  </svg>
+</div>
+
+<!-- ─── FLAVORS ────────────────────────────────────── -->
+<section id="flavors">
+  <div class="section-header">
+    <p class="section-eyebrow">Our Blends</p>
+    <h2 class="section-title">Four Flavors, One Heritage</h2>
+    <p class="section-sub">Each blend tells a story — sourced from time-honoured traditions across the archipelago and the Straits.</p>
+  </div>
+
+  <div class="flavors-grid">
+    <!-- Card 1 -->
+    <div class="flavor-card">
+      <div class="flavor-swatch swatch-turmeric">
+        <div class="swatch-icon">🌿</div>
+      </div>
+      <div class="flavor-body">
+        <p class="flavor-tag">Bestseller</p>
+        <h3 class="flavor-name">Turmeric &amp; Ginger</h3>
+        <p class="flavor-desc">The original Jamu pair. Warming, golden, and grounding — a daily ritual for centuries in Java and beyond.</p>
+        <button class="btn-card">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="flavor-card">
+      <div class="flavor-swatch swatch-pandan">
+        <div class="swatch-icon">🌱</div>
+      </div>
+      <div class="flavor-body">
+        <p class="flavor-tag">Fan Favourite</p>
+        <h3 class="flavor-name">Pandan Lemongrass</h3>
+        <p class="flavor-desc">Bright and fragrant with the cool sweetness of pandan and the citrusy lift of fresh lemongrass.</p>
+        <button class="btn-card">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="flavor-card">
+      <div class="flavor-swatch swatch-tamarind">
+        <div class="swatch-icon">🍯</div>
+      </div>
+      <div class="flavor-body">
+        <p class="flavor-tag">Limited Blend</p>
+        <h3 class="flavor-name">Tamarind &amp; Honey</h3>
+        <p class="flavor-desc">A bold balance of tangy tamarind and floral raw honey. Digestive, restorative, and utterly unique.</p>
+        <button class="btn-card">Add to Cart</button>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="flavor-card">
+      <div class="flavor-swatch swatch-cinnamon">
+        <div class="swatch-icon">👑</div>
+      </div>
+      <div class="flavor-body">
+        <p class="flavor-tag">Signature</p>
+        <h3 class="flavor-name">Royal Cinnamon</h3>
+        <p class="flavor-desc">Inspired by palace Jamu recipes. Heady Ceylon cinnamon with clove and cardamom — spiced nobility in a cup.</p>
+        <button class="btn-card">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ──────────────────────────────── -->
+<div class="wave-divider" style="background: var(--cream-dark);">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,0 C360,60 1080,0 1440,50 L1440,0 L0,0 Z" fill="var(--cream)"/>
+  </svg>
+</div>
+
+<!-- ─── HOW TO BREW ────────────────────────────────── -->
+<section id="brew">
+  <div class="section-header">
+    <p class="section-eyebrow">Ritual Made Simple</p>
+    <h2 class="section-title">How to Brew</h2>
+    <p class="section-sub">Three steps. One mindful moment. Centuries of goodness in your hands.</p>
+  </div>
+
+  <div class="brew-steps">
+    <div class="brew-step">
+      <div class="brew-step-icon">🥄</div>
+      <div class="brew-step-num">1</div>
+      <h3>Scoop</h3>
+      <p>Measure one heaped teaspoon (approx. 5g) of Ramu Jamu powder into your favourite mug.</p>
+    </div>
+    <div class="brew-step">
+      <div class="brew-step-icon">💧</div>
+      <div class="brew-step-num">2</div>
+      <h3>Add Hot Water</h3>
+      <p>Pour 200ml of freshly boiled water (90–95°C) over the powder. Let it bloom for 10 seconds.</p>
+    </div>
+    <div class="brew-step">
+      <div class="brew-step-icon">✨</div>
+      <div class="brew-step-num">3</div>
+      <h3>Stir &amp; Enjoy</h3>
+      <p>Stir gently until dissolved. Breathe in the aroma. Sip slowly, and let the herbs work their magic.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ──────────────────────────────── -->
+<div class="wave-divider" style="background: var(--cream-dark);">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,50 C360,0 1080,60 1440,10 L1440,60 L0,60 Z" fill="var(--maroon)"/>
+  </svg>
+</div>
+
+<!-- ─── HERITAGE STORY ─────────────────────────────── -->
+<section id="story">
+  <div class="batik-pattern"></div>
+  <div class="story-inner">
+    <div class="story-text fade-up">
+      <p class="section-eyebrow">Our Story</p>
+      <h2 class="section-title">Rooted in the Archipelago, Brewed for the Straits</h2>
+      <p>Jamu has been Indonesia's gift to the world for over a thousand years — herbal wisdom passed from ibu to anak, from the royal courts of Yogyakarta to the hawker lanes of Singapore's Kampong Glam.</p>
+      <p>Ramu Jamu was born from a simple conviction: that this heritage deserved a place in the modern wellness ritual. We work with small-batch farmers in Java and Sumatra, sourcing turmeric, ginger, lemongrass, and pandan at their peak — then gently powdering them to preserve every volatile oil, every healing compound.</p>
+      <p>No compromise. No shortcuts. Just the earth, the roots, and time.</p>
+      <a href="#cta-banner" class="btn-primary btn-outline">Read Our Full Story</a>
+    </div>
+    <div class="story-decor fade-up">
+      <div class="story-medallion">
+        <div class="story-ring-1"></div>
+        <div class="story-ring-2"></div>
+        <div class="story-medallion-text">
+          <div class="big-num">1000</div>
+          <p>Years of</p>
+          <p>Jamu Wisdom</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WAVE DIVIDER ──────────────────────────────── -->
+<div class="wave-divider" style="background: var(--cream);">
+  <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+    <path d="M0,10 C480,70 960,0 1440,50 L1440,0 L0,0 Z" fill="var(--maroon)"/>
+  </svg>
+</div>
+
+<!-- ─── TESTIMONIALS ───────────────────────────────── -->
+<section id="testimonials">
+  <div class="section-header">
+    <p class="section-eyebrow">What People Say</p>
+    <h2 class="section-title">Words from the Community</h2>
+  </div>
+
+  <div class="testimonials-grid">
+    <div class="testimonial-card">
+      <div class="star-row">
+        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+      </div>
+      <p class="testimonial-text">
+        "The Turmeric &amp; Ginger blend has replaced my morning coffee. It's warming, grounding, and I feel the difference in my joints within weeks. This is the real deal — not some tourist version."
+      </p>
+      <div class="testimonial-author">
+        <div class="author-avatar">S</div>
+        <div class="author-info">
+          <strong>Siti Rahimah</strong>
+          <span>Singapore 🇸🇬 · Verified Customer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="star-row">
+        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+      </div>
+      <p class="testimonial-text">
+        "Pandan Lemongrass is absolutely divine. It smells like my grandmother's kitchen in Bandung. I order four packs a month and gift them to friends who've never tried Jamu before."
+      </p>
+      <div class="testimonial-author">
+        <div class="author-avatar">A</div>
+        <div class="author-info">
+          <strong>Agus Prabowo</strong>
+          <span>Jakarta 🇮🇩 · Verified Customer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <div class="star-row">
+        <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+      </div>
+      <p class="testimonial-text">
+        "I was sceptical about powder Jamu — I thought nothing could beat fresh. But the Royal Cinnamon blend genuinely surprised me. The depth of spice is remarkable. Ramu Jamu has made a believer out of me."
+      </p>
+      <div class="testimonial-author">
+        <div class="author-avatar">N</div>
+        <div class="author-info">
+          <strong>Nurul Huda</strong>
+          <span>Kuala Lumpur 🇲🇾 · Verified Customer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA BANNER ────────────────────────────────── -->
+<section id="cta-banner">
+  <div class="batik-pattern"></div>
+  <div class="cta-inner fade-up">
+    <p class="section-eyebrow">✦ Begin Your Ritual ✦</p>
+    <h2>Start Your Wellness Journey</h2>
+    <p>Choose your first blend and experience what a thousand years of herbal wisdom tastes like in your favourite mug.</p>
+    <div class="cta-buttons">
+      <a href="#flavors" class="btn-primary">Shop All Flavors</a>
+      <a href="#brew" class="btn-primary btn-outline">Learn to Brew</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── FOOTER ─────────────────────────────────────── -->
+<footer id="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a href="#hero" class="nav-logo">Ramu <span>Jamu</span></a>
+      <p>Ancient Wisdom, Brewed for Today. Traditional Indonesian herbal powder crafted for the modern wellness ritual.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Explore</h4>
+      <ul>
+        <li><a href="#story">Our Story</a></li>
+        <li><a href="#flavors">All Flavors</a></li>
+        <li><a href="#brew">How to Brew</a></li>
+        <li><a href="#testimonials">Reviews</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Support</h4>
+      <ul>
+        <li><a href="#">FAQ</a></li>
+        <li><a href="#">Shipping Info</a></li>
+        <li><a href="#">Returns</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Connect</h4>
+      <ul>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="#">Shopee</a></li>
+        <li><a href="#">Lazada</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-tagline">"Ancient Wisdom, Brewed for Today"</span>
+    <span class="footer-copy">© 2025 Ramu Jamu. All rights reserved.</span>
+  </div>
+</footer>
+
+<!-- ─── JAVASCRIPT ─────────────────────────────────── -->
+<script>
+  // Register ScrollTrigger plugin
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ── Hero animations on load ── */
+  const heroTl = gsap.timeline({ delay: 0.2 });
+  heroTl
+    .to('#heroEyebrow', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' })
+    .to('#heroTitle',   { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.3')
+    .to('#heroSub',     { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.4')
+    .to('#heroCta',     { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' }, '-=0.3');
+
+  /* ── Hero parallax ── */
+  gsap.to('#heroBg', {
+    y: '25%',
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '#hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: true,
+    }
+  });
+
+  /* ── Nav shrink on scroll ── */
+  ScrollTrigger.create({
+    start: 80,
+    onEnter:      () => document.getElementById('nav').classList.add('scrolled'),
+    onLeaveBack:  () => document.getElementById('nav').classList.remove('scrolled'),
+  });
+
+  /* ── Intro strip items ── */
+  gsap.utils.toArray('.intro-item.fade-up').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+        delay: i * 0.15,
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      }
+    );
+    el.classList.remove('fade-up'); // handled manually above
+  });
+
+  /* ── Flavor cards staggered ── */
+  gsap.to('.flavor-card', {
+    opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+    stagger: 0.15,
+    scrollTrigger: {
+      trigger: '.flavors-grid',
+      start: 'top 82%',
+    }
+  });
+
+  /* ── Brew steps ── */
+  gsap.utils.toArray('.brew-step').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+        delay: i * 0.2,
+        scrollTrigger: { trigger: '.brew-steps', start: 'top 80%' }
+      }
+    );
+  });
+
+  /* ── Story section fade-up ── */
+  gsap.utils.toArray('#story .fade-up').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0, duration: 0.85, ease: 'power3.out',
+        delay: i * 0.2,
+        scrollTrigger: { trigger: el, start: 'top 82%' }
+      }
+    );
+  });
+
+  /* ── Testimonial cards slide in ── */
+  gsap.utils.toArray('.testimonial-card').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, x: i % 2 === 0 ? -40 : 40 },
+      {
+        opacity: 1, x: 0, duration: 0.75, ease: 'power3.out',
+        delay: i * 0.15,
+        scrollTrigger: { trigger: '.testimonials-grid', start: 'top 82%' }
+      }
+    );
+  });
+
+  /* ── CTA banner fade up ── */
+  gsap.utils.toArray('#cta-banner .fade-up').forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 35 },
+      {
+        opacity: 1, y: 0, duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 85%' }
+      }
+    );
+  });
+
+  /* ── Mobile nav ── */
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+  const mobileClose = document.getElementById('mobileClose');
+
+  hamburger.addEventListener('click', () => mobileNav.classList.add('open'));
+  hamburger.addEventListener('keydown', e => e.key === 'Enter' && mobileNav.classList.add('open'));
+  mobileClose.addEventListener('click', closeMobileNav);
+
+  function closeMobileNav() { mobileNav.classList.remove('open'); }
+
+  /* ── "Add to Cart" feedback ── */
+  document.querySelectorAll('.btn-card').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const original = this.textContent;
+      this.textContent = '✓ Added!';
+      this.style.background = 'var(--green-muted)';
+      setTimeout(() => {
+        this.textContent = original;
+        this.style.background = '';
+      }, 1500);
+    });
+  });
+</script>
+</body>
+</html>
