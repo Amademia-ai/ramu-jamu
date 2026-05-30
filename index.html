@@ -475,6 +475,42 @@
       box-shadow: 0 4px 16px rgba(107, 26, 42, 0.3);
     }
 
+    /* ─── TIN POUR SECTION ─────────────────────────────────── */
+    #tin-pour {
+      background: var(--cream);
+      padding: var(--section-pad);
+      overflow: hidden;
+    }
+    .tin-pour-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3rem;
+    }
+    .tin-pour-text { text-align: center; }
+    .tin-scene {
+      position: relative;
+      width: 340px;
+      height: 380px;
+    }
+    #powderCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+    .tin-wrap {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 160px;
+      transform-origin: bottom center;
+      filter: drop-shadow(4px 8px 16px rgba(0,0,0,0.25));
+    }
+    #tinSvg { width: 160px; height: 220px; }
+
     /* ─── HOW TO BREW ───────────────────────────────────────── */
     #brew {
       padding: var(--section-pad);
@@ -1113,6 +1149,61 @@
   </svg>
 </div>
 
+<!-- ─── TIN POUR ANIMATION ───────────────────────────── -->
+<section id="tin-pour">
+  <div class="tin-pour-inner">
+    <div class="tin-pour-text">
+      <h2 class="section-title">Crafted in Every Pour</h2>
+      <p class="section-sub">Scroll to reveal the goodness inside.</p>
+    </div>
+    <div class="tin-scene">
+      <canvas id="powderCanvas"></canvas>
+      <div class="tin-wrap">
+        <!-- Metal tin SVG -->
+        <svg id="tinSvg" viewBox="0 0 160 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- Tin body -->
+          <defs>
+            <linearGradient id="tinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#8a8a8a"/>
+              <stop offset="30%" style="stop-color:#d4d4d4"/>
+              <stop offset="60%" style="stop-color:#b0b0b0"/>
+              <stop offset="100%" style="stop-color:#6a6a6a"/>
+            </linearGradient>
+            <linearGradient id="lidGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#aaaaaa"/>
+              <stop offset="40%" style="stop-color:#e8e8e8"/>
+              <stop offset="100%" style="stop-color:#888888"/>
+            </linearGradient>
+            <linearGradient id="labelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#8B2A3E"/>
+              <stop offset="100%" style="stop-color:#4A0F1C"/>
+            </linearGradient>
+          </defs>
+          <!-- Body -->
+          <rect x="15" y="40" width="130" height="160" rx="8" fill="url(#tinGrad)"/>
+          <!-- Label -->
+          <rect x="22" y="65" width="116" height="110" rx="4" fill="url(#labelGrad)"/>
+          <text x="80" y="105" text-anchor="middle" fill="#F5F0E8" font-family="Georgia, serif" font-size="13" font-weight="bold">RAMU</text>
+          <text x="80" y="122" text-anchor="middle" fill="#C8A84B" font-family="Georgia, serif" font-size="11">JAMU</text>
+          <line x1="30" y1="130" x2="130" y2="130" stroke="#C8A84B" stroke-width="0.8" opacity="0.6"/>
+          <text x="80" y="148" text-anchor="middle" fill="#EDE4D3" font-family="sans-serif" font-size="7" letter-spacing="1">HERBAL POWDER</text>
+          <text x="80" y="162" text-anchor="middle" fill="#EDE4D3" font-family="sans-serif" font-size="6" letter-spacing="0.5">TRADITIONAL BLEND</text>
+          <!-- Shine -->
+          <rect x="15" y="40" width="18" height="160" rx="4" fill="white" opacity="0.08"/>
+          <!-- Bottom rim -->
+          <rect x="12" y="192" width="136" height="10" rx="4" fill="url(#lidGrad)"/>
+          <!-- Lid -->
+          <rect x="10" y="28" width="140" height="18" rx="5" fill="url(#lidGrad)"/>
+          <rect x="20" y="24" width="120" height="10" rx="4" fill="url(#lidGrad)"/>
+          <rect x="30" y="20" width="100" height="8" rx="3" fill="#cccccc"/>
+          <!-- Shine on lid -->
+          <rect x="28" y="22" width="40" height="3" rx="2" fill="white" opacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ─── HERITAGE STORY ─────────────────────────────── -->
 <section id="story">
   <div class="batik-pattern"></div>
@@ -1371,6 +1462,105 @@
   mobileClose.addEventListener('click', closeMobileNav);
 
   function closeMobileNav() { mobileNav.classList.remove('open'); }
+
+  /* ── TIN POUR ANIMATION ── */
+  (function() {
+    const canvas = document.getElementById('powderCanvas');
+    const tinWrap = document.querySelector('.tin-wrap');
+    if (!canvas || !tinWrap) return;
+
+    // ctx defined below
+    // Set canvas size
+    function resizeCanvas() {
+      const scene = canvas.parentElement;
+      canvas.width = scene.offsetWidth;
+      canvas.height = scene.offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    const ctx2 = canvas.getContext('2d');
+    const particles = [];
+    let pourProgress = 0; // 0..1
+    let animFrame;
+
+    const COLORS = ['#C8A84B','#D4956A','#8B5E3C','#A0845C','#B8974E','#E8C97A','#C49A6C'];
+
+    function spawnParticles(progress) {
+      if (progress <= 0) return;
+      // Spout exit point: top-right of tin when tilted
+      const cx = canvas.width / 2;
+      const tinTop = 30;
+      // Tin tilts up to -110deg; spout is top-left corner when rotated
+      const angle = -progress * 110 * Math.PI / 180;
+      const spoutX = cx + Math.cos(angle - Math.PI/2) * 80;
+      const spoutY = tinTop + Math.sin(angle - Math.PI/2) * 80 + 110;
+
+      const count = Math.floor(progress * 6);
+      for (let i = 0; i < count; i++) {
+        particles.push({
+          x: spoutX + (Math.random() - 0.5) * 10,
+          y: spoutY,
+          vx: (Math.random() - 0.5) * 2 + Math.cos(angle + Math.PI/2) * 3,
+          vy: Math.random() * 2 + 1,
+          size: Math.random() * 5 + 2,
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+          opacity: 0.9,
+          life: 1.0,
+          decay: 0.012 + Math.random() * 0.01,
+          gravity: 0.18,
+          shape: Math.random() > 0.5 ? 'circle' : 'rect',
+        });
+      }
+    }
+
+    function drawParticles() {
+      ctx2.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.vx *= 0.99;
+        p.life -= p.decay;
+        p.opacity = p.life;
+        if (p.life <= 0) { particles.splice(i, 1); continue; }
+        ctx2.globalAlpha = p.opacity;
+        ctx2.fillStyle = p.color;
+        if (p.shape === 'circle') {
+          ctx2.beginPath();
+          ctx2.arc(p.x, p.y, p.size / 2, 0, Math.PI * 2);
+          ctx2.fill();
+        } else {
+          ctx2.fillRect(p.x - p.size/2, p.y - p.size/2, p.size, p.size * 0.6);
+        }
+      }
+      ctx2.globalAlpha = 1;
+    }
+
+    function loop() {
+      spawnParticles(pourProgress);
+      drawParticles();
+      animFrame = requestAnimationFrame(loop);
+    }
+    loop();
+
+    // ScrollTrigger: tilt tin + drive pourProgress
+    gsap.to({}, {
+      scrollTrigger: {
+        trigger: '#tin-pour',
+        start: 'top 70%',
+        end: 'bottom 20%',
+        scrub: 1.2,
+        onUpdate: (self) => {
+          pourProgress = self.progress;
+          // Rotate tin: 0 -> -110deg
+          const deg = -pourProgress * 110;
+          tinWrap.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+        }
+      }
+    });
+  })();
 
   /* ── "Add to Cart" feedback ── */
   document.querySelectorAll('.btn-card').forEach(btn => {
